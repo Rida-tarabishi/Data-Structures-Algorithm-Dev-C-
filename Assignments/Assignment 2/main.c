@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     //Print Prompt
     menu();
 
-    //get input choice
+    //get input choice used scanf for now.
     scanf ("%d", &choice);
 
     //loop or exit
