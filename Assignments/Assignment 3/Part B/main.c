@@ -1,5 +1,5 @@
 
-// Part A Assignment 3
+// Part B Assignment 3
 // Create By MHD Rida Tarabishi
 //
 
@@ -15,12 +15,15 @@ void removeNewLine(char *array, int size);
 bool isValid(long id, int published,char rating);
 
 
+
+
 int main(void)
 {
+    //initialize head and tail of Queue
+    BookQueuePtr headPtr = NULL;
+    BookQueuePtr tailPtr = NULL;
 
-    ItemPtr stackPtr = NULL;
-
-    int userChoice;
+    int menuChoice;
     char input[100];
 
     long id;
@@ -29,23 +32,27 @@ int main(void)
     char title[100];
     char rating;
 
+    // display the menu
     instructions();
 
-    fgets(input, sizeof(input), stdin);
-    userChoice = strtol(input,NULL,10);
 
-    while (userChoice!=6)
+    fgets(input, sizeof(input), stdin);
+    menuChoice = strtol(input,NULL,10);
+
+    while ( menuChoice != 6 )
     {
-        switch (userChoice)
+        switch( menuChoice )
         {
             case 1:
-                printf("Enter book Details to add to Stack: ");
+                printf("Enter book Details to add to Stack: \n");
+                puts("id: ");
                 fgets(input, sizeof(input), stdin);
                 input[strcspn(input, "\n")] = '\0';
                 id = strtol(input, NULL, 10);
 
-                if(bookExists(stackPtr, id)) break;
+                if(bookExists(headPtr, id)) break;
 
+                puts("Date Published: ");
                 fgets(input, sizeof(input), stdin);
                 input[strcspn(input, "\n")] = '\0';
                 published = strtol(input, NULL, 10);
@@ -53,14 +60,17 @@ int main(void)
                 //in case numbers are not allowed in Author and title
                 //I would loop through characters and check with isDigit
 
+                puts("Author: ");
                 fgets(author, sizeof(author), stdin);
                 removeNewLine(author, strlen(author));
                 input[strcspn(author, "\n")] = '\0';
 
+                puts("Title: ");
                 fgets(title, sizeof(title), stdin);
                 removeNewLine(title, strlen(title));
                 input[strcspn(author, "\n")] = '\0';
 
+                puts("Rating: ");
                 rating = toupper(getchar());
 
                 if(!isValid(id, published,rating))
@@ -68,35 +78,40 @@ int main(void)
                     puts("Please Try Again");
                     break;
                 }
-                stackPtr = push(stackPtr, id,  published,  author,  title, rating);//push node onto stack
-                printStack(stackPtr);//print the stack nodes
+
+                enqueue(&headPtr, &tailPtr, id,  published,  author,  title, rating);
+                printQueue(headPtr);
                 break;
+
             case 2:
-                if(!isEmpty(stackPtr)) stackPtr = pop(stackPtr);
-                printStack(stackPtr);
+                dequeue(&headPtr, &tailPtr, headPtr);
+                printQueue(headPtr);
                 break;
+
             case 3:
-                !isEmpty(stackPtr) ? topOfStack(stackPtr) : puts("No Books in the Library");
+                front(headPtr);
                 break;
+
             case 4:
-                !isEmpty(stackPtr) ? bottomOfStack(stackPtr) : puts("No Books in the Library");
+                tail(tailPtr);
                 break;
+
             case 5:
-                printStack(stackPtr);
+                printQueue(headPtr);
                 break;
+
             default:
-                printf("Invalid choice.\n");
+                puts( "Invalid choice.\n" );
                 break;
         }
 
         fflush(stdin);
         instructions();
         fgets(input, sizeof(input), stdin);
-        userChoice = strtol(input,NULL,10);
+        menuChoice = strtol(input,NULL,10);
     }
 
 }
-
 
 void removeNewLine(char *array, int size)
 {
@@ -107,7 +122,7 @@ void removeNewLine(char *array, int size)
 
 
 // to validate user entry
-// alternativley i would import POSIX library to make use of regex
+// alternativley I would import POSIX library to make use of regex
 bool isValid(long id, int published,char rating)
 {
 
@@ -120,11 +135,14 @@ bool isValid(long id, int published,char rating)
         puts(" ********* Error ********* \n Id must be positve number \n");
         isValid = false;
     }
+
+    // Fixed an issue where this statment was inversed in Part A of the Assignment
     if(isdigit(rating))
     {
         puts(" ********* Error ********* \n Rating must be a Character (A-Z) \n");
         isValid = false;
     }
+
     if(published<=0)
     {
         puts(" ********* Error ********* \n Published Date must be positve number \n");
